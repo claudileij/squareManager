@@ -21,7 +21,7 @@ npm install
 
 Criando .env e colocando o token:
 
-*Crie um arquivo .env, com algum editor de texto abra-o, e defina o token do bot*
+*Crie um arquivo dentro da pasta Bot (.env), com algum editor de texto abra-o, e defina o token do bot*
 
 Exemplo:
 

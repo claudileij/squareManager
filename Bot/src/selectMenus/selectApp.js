@@ -3,6 +3,7 @@ const wait = require('node:timers/promises').setTimeout;
 const {SquareCloudAPI} = require('@squarecloud/api')
 const { ButtonBuilder, ButtonStyle, ActionRowBuilder, EmbedBuilder, ComponentType } = require('discord.js')
 
+/* Classe Select, iniciada quando o select menu com o mesmo name for utilizado */
 module.exports = class extends Select{
     constructor(client){
         super(client, {
@@ -11,16 +12,18 @@ module.exports = class extends Select{
     }
 
     run = async (interaction) => {
-        let appid = interaction.values[0]
-        if(appid == "semapps"){return interaction.reply({content: "Você não tem aplicações, faça o upload no site da square: https://squarecloud.app", ephemeral: true})}
+        let appid = interaction.values[0] // Id da aplicação, passada como value nas options do select menu
+        if(appid == "semapps"){return interaction.reply({content: "Você não tem aplicações, faça o upload no site da square: https://squarecloud.app", ephemeral: true})} // Caso o usuário não tenha aplicações hospedadas
         
-        let db = this.client.db.API
-        let db_user = await db.findOne({where: {userid: interaction.user.id}});
+        let db = this.client.db.API // Atalho pra acessar a db, posteriormente definida na classe Client
+        let db_user = await db.findOne({where: {userid: interaction.user.id}}); // Procurando se um usuário já está no banco de dados pelo userid
+        
+        /* Definindo o app */
         let square = new SquareCloudAPI(db_user.api_key)
         let user = await square.users.get();
         let app = await user.applications.get(appid);
 
-
+        /* Função que irá retornar os status da aplicação atualizadas */
         let updateEmbed = async () => {
             let appStatus = await app.getStatus();
             let appLogs = await app.getLogs();
@@ -53,6 +56,8 @@ module.exports = class extends Select{
         await interaction.reply({embeds: [data[0]], components: [data[1]], ephemeral: true})
         var isCollecting = true
 
+
+        /* Eventos dos buttons emitidos pelo interaction.js */
         this.client.on('stopapp', async (i) => {
             if(interaction.user.id != i.user.id){return}
             if(!isCollecting){return}
