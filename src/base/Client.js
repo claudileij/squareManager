@@ -7,39 +7,40 @@ const { join } = require('path')
 module.exports = class extends Client {
     constructor(db, options) {
         super(options)
-
         /* Definindo variáveis e carregando componentes */
         this.commands = []
         this.selectMenus = []
-        this.loadCmd()
-        this.loadEvent()
-        this.loadSelects()
         this.db = db
+
+        this.loadSlashCommands()
+        this.loadEvents()
+        this.loadSelects()
+        
     }
 
     setCommands() {
         this.guilds.cache.map(guild => guild.commands.set(this.commands))
     }
 
-    loadCmd() {
+    loadSlashCommands() {
         const path = 'src/commands'
         const files = readdirSync(path)
 
         for (const file of files) {
-            const command = require(join(process.cwd(), `${path}/${file}`))
-            const cmd = new (command)(this,)
-            this.commands.push(cmd)
+            const commandClass = require(join(process.cwd(), `${path}/${file}`))
+            const commandHandler = new (commandClass)(this,)
+            this.commands.push(commandHandler)
         }
     }
 
-    loadEvent() {
+    loadEvents() {
         const path = 'src/events'
         const files = readdirSync(path)
 
         for (const file of files) {
-            const event = require(join(process.cwd(), `${path}/${file}`))
-            const evt = new (event)(this)
-            this.on(evt.name, evt.run)
+            const eventClass = require(join(process.cwd(), `${path}/${file}`))
+            const eventHandler = new (eventClass)(this)
+            this.on(eventHandler.name, eventHandler.run)
         }
     }
 
@@ -48,9 +49,9 @@ module.exports = class extends Client {
         const files = readdirSync(path)
 
         for (const file of files) {
-            const event = require(join(process.cwd(), `${path}/${file}`))
-            const evt = new (event)(this)
-            this.selectMenus.push(evt)
+            const selectClass = require(join(process.cwd(), `${path}/${file}`))
+            const selectHandler = new (selectClass)(this)
+            this.selectMenus.push(selectHandler)
         }
     }
 }

@@ -23,10 +23,10 @@ module.exports = class extends Command {
     run = async (interaction) => {
         const db = this.client.db.API // Atalho pra acessar a db, posteriormente definida na classe Client
         const api_key = interaction.options.getString('api_key'); // Obtendo o valor passado pelo usuário, no slash command
-        const user = await db.findOne({ where: { userid: interaction.user.id } }); // Procurando se um usuário já está no banco de dados pelo userid
+        const dbUser = await db.findOne({ where: { userid: interaction.user.id } }); // Procurando se um usuário já está no banco de dados pelo userid
 
         /* Caso o usuário não estiver registrado no banco de dados, então ele o registrará com as informações necessárias*/
-        if (!user) {
+        if (!dbUser) {
             try {
                 await db.create({
                     username: interaction.user.username,
@@ -39,8 +39,8 @@ module.exports = class extends Command {
             }
         } else { // Caso o usuário já esteja no banco de dados, apenas atualizará o api_key
             try {
-                user.api_key = api_key;
-                user.save()
+                dbUser.api_key = api_key;
+                dbUser.save()
                 return interaction.reply({ content: '```\nAPI_KEY atualizado com sucesso, você pode continuar a usar /apps 😉\n```', ephemeral: true })
             } catch (error) {
                 return interaction.reply({ content: `Houve um erro ao atualizar: ${error.name}`, ephemeral: true })
