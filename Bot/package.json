@@ -20,8 +20,6 @@
     "@squarecloud/api": "^3.4.2",
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.4",
-    "fs": "^0.0.1-security",
-    "path": "^0.12.7",
     "sequelize": "^6.37.0",
     "sqlite3": "^5.1.7"
   }
