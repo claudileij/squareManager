@@ -1,7 +1,7 @@
 const Event = require('../base/Event')
 
-module.exports = class extends Event{
-    constructor(client){
+module.exports = class extends Event {
+    constructor(client) {
         super(client, {
             name: "ready"
         })
