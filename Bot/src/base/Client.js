@@ -3,10 +3,12 @@ const {readdirSync} = require('fs')
 const {join} = require('path')
 
 
+/* Exportando o extends da classe Client do discord.js */
 module.exports = class extends Client{
     constructor(db, options){
         super(options)
 
+        /* Definindo variáveis e carregando componentes */
         this.commands = []
         this.selectMenus = []
         this.loadCmd()

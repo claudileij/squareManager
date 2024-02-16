@@ -9,6 +9,6 @@ module.exports = class extends Event{
 
     run = async () => {
         console.log(`[${this.client.user.tag}] Logged!`)
-        this.client.setCommands()
+        this.client.setCommands() // Quando o bot for iniciado, ele irá carregar a função do Client que define os comandos do bot nos servidores (guilds).
     }
 }
