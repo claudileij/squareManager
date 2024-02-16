@@ -21,7 +21,7 @@ module.exports = class extends Command {
     run = async (interaction) => {
         let db = this.client.db.API
         let api_key = interaction.options.getString('api_key');
-        let user = await db.findOne({where: {userid: interaction.user.id}})
+        let user = await db.findOne({where: {userid: interaction.user.id}});
 
         if(!user){
             try{
