@@ -1,0 +1,28 @@
+{
+  "name": "squarebot",
+  "version": "1.0.0",
+  "description": "An bot for squarecloud applications",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nxSlayer/squareManager.git"
+  },
+  "author": "Slayer",
+  "license": "SEE LICENSE IN https://github.com/nxSlayer/squareManager/blob/main/LICENSE",
+  "bugs": {
+    "url": "https://github.com/nxSlayer/squareManager/issues"
+  },
+  "homepage": "https://github.com/nxSlayer/squareManager#readme",
+  "dependencies": {
+    "@squarecloud/api": "^3.4.2",
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.4.4",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "sequelize": "^6.37.0",
+    "sqlite3": "^5.1.7"
+  }
+}
