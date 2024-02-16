@@ -10,7 +10,7 @@ Clonando o repositório usando git:
 
 ```bash
 git clone https://github.com/nxSlayer/squareManager.git
-cd squareManager/Bot
+cd squareManager/
 ```
 
 Instalando as dependências:
@@ -21,7 +21,7 @@ npm install
 
 Criando .env e colocando o token:
 
-*Crie um arquivo dentro da pasta Bot (.env), com algum editor de texto abra-o, e defina o token do bot*
+*Crie um arquivo .env, com algum editor de texto abra-o, e defina o token do bot*
 
 Exemplo:
 
