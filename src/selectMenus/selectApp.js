@@ -21,12 +21,19 @@ module.exports = class extends Select {
         /* Definindo o app */
         const square = new SquareCloudAPI(dbUser.api_key)
         const user = await square.users.get();
-        const app = await user.applications.get(appid);
+        const app = await square.applications.get(appId);
 
         /* Função que irá retornar os status da aplicação atualizadas */
         const updateEmbed = async () => {
             const appStatus = await app.getStatus();
-            const appLogs = await app.getLogs();
+            let appLogs
+            try {
+                appLogs = await app.getLogs();
+            } catch (error) {
+                appLogs = "NO-LOGS"
+            }
+
+
 
             const buttonStart = new ButtonBuilder().setCustomId('startapp').setLabel('Start').setStyle(ButtonStyle.Success)
                 .setDisabled(appStatus.running)
@@ -37,7 +44,7 @@ module.exports = class extends Select {
 
             const estilizedStatus = appStatus.status == 'running' ? '```diff\n+ running \n```' : '```diff\n- exited \n```'
             const appEmbed = new EmbedBuilder()
-                .setTitle(app.tag)
+                .setTitle(app.name)
                 .setThumbnail('https://squarecloud.app/_next/image?url=%2Flogo.png&w=1080&q=75')
                 .addFields(
                     { name: "CPU", value: '`' + appStatus.usage.cpu + '`', inline: true },
@@ -47,38 +54,69 @@ module.exports = class extends Select {
                     { name: 'LOGS', value: '```bash\n' + appLogs.slice(-200) + '\n```', inline: false }
                 )
 
+
             return [appEmbed, appRow]
 
         }
 
+        const stoppingEmbed = new EmbedBuilder()
+        .setTitle("Encerrando...")
+        .setDescription("Aguarde um momento até que sua aplicação seja encerrada, este embed será atualizado assim que terminarmos 😉")
+        .setThumbnail('https://squarecloud.app/_next/image?url=%2Flogo.png&w=1080&q=75')
 
+        const startingEmbed = new EmbedBuilder()
+        .setTitle("Iniciando...")
+        .setDescription("Aguarde um momento até que sua aplicação seja iniciada, este embed será atualizado assim que terminarmos 😉")
+        .setThumbnail('https://squarecloud.app/_next/image?url=%2Flogo.png&w=1080&q=75')
+
+        const restartingEmbed = new EmbedBuilder()
+        .setTitle("Reiniciando...")
+        .setDescription("Aguarde um momento até que sua aplicação seja reiniciada, este embed será atualizado assim que terminarmos 😉")
+        .setThumbnail('https://squarecloud.app/_next/image?url=%2Flogo.png&w=1080&q=75')
+
+        const gettingApplication = new EmbedBuilder()
+        .setTitle("Coletando aplicação...")
+        .setDescription("Aguarde um momento até que os dados da sua aplicação sejam coletados, este embed será atualizado assim que terminarmos 😉")
+        .setThumbnail('https://squarecloud.app/_next/image?url=%2Flogo.png&w=1080&q=75')
+
+
+        await interaction.reply({embeds: [gettingApplication], ephemeral: true})
         const appData = await updateEmbed()
+        
         var isCollecting = true
-        await interaction.reply({ embeds: [appData[0]], components: [appData[1]], ephemeral: true })
+        await interaction.editReply({ embeds: [appData[0]], components: [appData[1]], ephemeral: true })
+
+        
 
         /* Eventos dos buttons emitidos pelo interaction.js */
         this.client.on('stopapp', async (i) => {
             if (interaction.user.id != i.user.id) { return }
             if (!isCollecting) { return }
 
+            await interaction.editReply({embeds: [stoppingEmbed]})
             await app.stop()
+            await wait(5000)
             const appData = await updateEmbed()
             await interaction.editReply({ embeds: [appData[0]], components: [appData[1]] })
         })
-        this.client.on('startapp', async () => {
+        this.client.on('startapp', async (i) => {
             if (interaction.user.id != i.user.id) { return }
             if (!isCollecting) { return }
 
+            await interaction.editReply({embeds: [startingEmbed]})
             await app.start()
+            await wait(5000)
             const appData = await updateEmbed()
-            await interaction.editReply({ embeds: [appData[0]], components: [appData[1]] })
+            await interaction.editReply({embeds: [appData[0]], components: [appData[1]] })
         })
 
-        this.client.on('restartapp', async () => {
+        this.client.on('restartapp', async (i) => {
             if (interaction.user.id != i.user.id) { return }
             if (!isCollecting) { return }
 
+            await interaction.editReply({embeds: [restartingEmbed], components: []})
             await app.restart()
+            await wait(5000)
             const appData = await updateEmbed()
             await interaction.editReply({ embeds: [appData[0]], components: [appData[1]] })
         })

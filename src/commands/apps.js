@@ -22,6 +22,13 @@ module.exports = class extends Command {
         if (!db_user) { return interaction.reply({ content: "```\n🤨 Você ainda não tem uma API_KEY registrada, use o comando /register para se registrar\n```", ephemeral: true }) } //Caso o usuário não seja encontrado (!db_user), irá retornar.
 
 
+        const gettingUser = new EmbedBuilder()
+            .setTitle("Coletando dados...")
+            .setDescription("Aguarde um momento até que os dados do seu usuário sejam coletados, este embed será atualizado assim que terminarmos 😉")
+            .setThumbnail('https://squarecloud.app/_next/image?url=%2Flogo.png&w=1080&q=75')
+
+        await interaction.reply({ embeds: [gettingUser], ephemeral: true })
+
         const square = new SquareCloudAPI(db_user.api_key)
         try {
             const user = await square.users.get();
@@ -32,20 +39,22 @@ module.exports = class extends Command {
             var running = 0
 
             /*Definindo variáveis, e caso uma das opções sejam udefined, irá ser convertido para outro valor*/
-            const ramUsed = user.plan.used != undefined ? user.plan.used : 0
-            const ramLimit = user.plan.limit != undefined ? user.plan.limit : 0
-            const expireIn = user.plan.expiresIn != undefined ? `<t:${user.plan.expiresIn}:R>` : "`Permanent`"
+            const ramUsed = user.plan.memory.used != undefined ? user.plan.memory.used : 0
+            const ramLimit = user.plan.memory.limit != undefined ? user.plan.memory.limit : 0
+            const expireIn = user.plan.expiresInTimestamp != undefined ? `<t:${Math.floor(user.plan.expiresInTimestamp / 1000)}:R>` : "`Permanent`"
             /*                     */
 
             if (apps.size == 0) { models.push({ label: "Nenhum app", description: "Faça o upload do seu app no site da square", emoji: '🔎', value: 'semapps' }) } // Caso o usuário não tenha nenhum app, irá criar um item no select menu, informando que o usuário não tem aplicações.
 
 
             /* Incluindo todas as aplicações na variável model, para depois ser carregada em  StringSelectMenuBuilder.addOptions*/
-            apps.map(async (app) => {
-                const status = await app.getStatus();
+            for (const [id, value] of apps) {
+                const app = apps.get(id)
+                const application = await square.applications.get(app.id);
+                const status = await application.getStatus();
                 if (status.running) { running++ }
-                models.push({ label: app.tag, description: app.description, emoji: '920499646562992159', value: app.id })
-            })
+                models.push({ label: app.tag, description: app.description, emoji: status.running ? '🟢' : '🔴', value: app.id })
+            }
 
             /*                                    */
 
@@ -61,7 +70,6 @@ module.exports = class extends Command {
                     { name: "Aplicações ativas", value: '`' + String(running) + '`', inline: true }
                 )
             /*                                                                         */
-
 
             /* Select Menu, que irá coletar todas as aplicações do models e transforma-lo em uma option*/
             const select = new StringSelectMenuBuilder()
@@ -83,11 +91,11 @@ module.exports = class extends Command {
             const row = new ActionRowBuilder().addComponents(select)
 
 
-            await interaction.reply({ embeds: [embed], components: [row], ephemeral: true })
+            await interaction.editReply({ embeds: [embed], components: [row], ephemeral: true })
         }
         catch (error) {
             console.log(error)
-            return interaction.reply({ content: '```\n😞 Houve um erro, verifique se sua api_key é valida: ' + error.message + "\n```", ephemeral: true })
+            return interaction.editReply({ content: '```\n😞 Houve um erro, verifique se sua api_key é valida: ' + error.message + "\n```", ephemeral: true })
         }
 
 
