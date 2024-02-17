@@ -122,7 +122,7 @@ module.exports = class extends Select {
         })
 
         for (const i in [...Array(12).keys()]) {
-            await wait(5000)
+            await wait(10000)
             const appData = await updateEmbed()
             await interaction.editReply({ embeds: [appData[0]], components: [appData[1]] })
             if (i == 11) { isCollecting = false }
