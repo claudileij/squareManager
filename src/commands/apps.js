@@ -52,8 +52,9 @@ module.exports = class extends Command {
                 const app = apps.get(id)
                 const application = await square.applications.get(app.id);
                 const status = await application.getStatus();
+                const description = app.description != '' && app.description != undefined ? app.description : 'No description'
                 if (status.running) { running++ }
-                models.push({ label: app.tag, description: app.description, emoji: status.running ? '🟢' : '🔴', value: app.id })
+                models.push({ label: app.tag, description: description, emoji: status.running ? '🟢' : '🔴', value: app.id })
             }
 
             /*                                    */
